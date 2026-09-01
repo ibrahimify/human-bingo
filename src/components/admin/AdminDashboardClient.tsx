@@ -32,12 +32,17 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
   }
 
   const updateSessionStatus = async (id: string, status: string) => {
-    const updates: any = { status }
-    if (status === 'active') updates.started_at = new Date().toISOString()
-    if (status === 'closed') updates.stopped_at = new Date().toISOString()
-    
-    await supabase.from('game_sessions').update(updates).eq('id', id)
-    setSessions(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
+    try {
+      const response = await fetch(`/api/sessions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+      })
+      const data = await response.json()
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, ...data } : s))
+    } catch (error) {
+      console.error('Failed to update session status:', error)
+    }
   }
 
   // Realtime & Data Fetching
