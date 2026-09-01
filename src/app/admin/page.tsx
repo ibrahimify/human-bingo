@@ -1,7 +1,14 @@
+import { isAdminAuthenticated } from '@/lib/auth/admin'
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/server'
 import { AdminDashboardClient } from '@/components/admin/AdminDashboardClient'
 
 export default async function AdminPage() {
+  const isAuth = await isAdminAuthenticated()
+  if (!isAuth) {
+    redirect('/admin/login')
+  }
+
   const supabase = await createAdminClient()
 
   // Fetch sessions
