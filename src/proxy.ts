@@ -8,7 +8,7 @@ export async function proxy(request: NextRequest) {
     const adminSession = request.cookies.get('bme_admin_session')?.value
     const secret = process.env.ADMIN_SESSION_SECRET
 
-    if (!adminSession || adminSession !== secret) {
+    if (!adminSession || !secret || adminSession !== secret) {
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
       return NextResponse.redirect(url)
