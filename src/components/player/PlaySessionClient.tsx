@@ -48,20 +48,37 @@ export function PlaySessionClient({ session }: { session: any }) {
       // Generate 5 missions
       const randomMissions = getRandomMissions()
 
-      // Create participant + missions via API
-      const response = await fetch('/api/participants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // Create participant
+      const { data: participant, error: partError } = await supabase
+        .from('participants')
+        .insert({
           session_id: session.id,
-          name: name.trim(),
-          missions: randomMissions
+          name: name.trim()
         })
-      })
-      
-      const participant = await response.json()
-      
-      if (!participant.id) {
+        .select()
+        .single()
+
+      if (partError || !participant) {
+        alert("Something went wrong. Try again.")
+        setLoading(false)
+        return
+      }
+
+      // Create missions
+      const missionInserts = randomMissions.map((m, i) => ({
+        participant_id: participant.id,
+        mission_id: m.id,
+        category: m.category,
+        position: i,
+        completed: false,
+      }))
+
+      const { error: missError } = await supabase
+        .from('participant_missions')
+        .insert(missionInserts)
+        .select()
+
+      if (missError) {
         alert("Something went wrong. Try again.")
         setLoading(false)
         return
