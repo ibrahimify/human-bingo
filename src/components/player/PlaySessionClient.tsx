@@ -43,45 +43,56 @@ export function PlaySessionClient({ session }: { session: any }) {
   const handleStart = async () => {
     if (!name.trim()) return
     setLoading(true)
-    const newParticipantId = uuidv4() // Generate ID on client for simplicity
+    const newParticipantId = uuidv4()
     
-    // Create participant
-    const { error: partError } = await supabase.from('participants').insert({
-      id: newParticipantId,
-      session_id: session.id,
-      name: name.trim()
-    })
+    try {
+      // Create participant via API
+      const response = await fetch('/api/participants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: session.id,
+          name: name.trim()
+        })
+      })
+      
+      const participant = await response.json()
+      
+      if (!participant.id) {
+        alert("Something went wrong. Try again.")
+        setLoading(false)
+        return
+      }
 
-    if (partError) {
+      // Generate 5 missions
+      const randomMissions = getRandomMissions()
+      
+      const missionInserts = randomMissions.map((m, i) => ({
+        participant_id: participant.id,
+        mission_id: m.id,
+        category: m.category,
+        position: i,
+        completed: false,
+      }))
+
+      const { error: missError } = await supabase.from('participant_missions').insert(missionInserts).select()
+      
+      if (missError) {
+        alert("Something went wrong. Try again.")
+        setLoading(false)
+        return
+      }
+
+      setMissions(randomMissions)
+      setParticipantId(participant.id)
+      setTimerStart(Date.now())
+      setStep('play')
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
       alert("Something went wrong. Try again.")
       setLoading(false)
-      return
     }
-
-    // Generate 5 missions
-    const randomMissions = getRandomMissions()
-    
-    const missionInserts = randomMissions.map((m, i) => ({
-      participant_id: newParticipantId,
-      mission_id: m.id,
-      category: m.category,
-      position: i,
-      completed: false,
-    }))
-
-    const { error: missError } = await supabase.from('participant_missions').insert(missionInserts).select()
-    
-    if (missError) {
-      alert("Something went wrong. Try again.")
-      setLoading(false)
-      return
-    }
-
-    setMissions(randomMissions)
-    setParticipantId(newParticipantId)
-    setTimerStart(Date.now())
-    setStep('play')
-    setLoading(false)
   }
 
   const handleNext = async () => {
