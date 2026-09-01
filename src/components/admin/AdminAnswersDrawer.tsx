@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-
+import { missions as allMissions } from '@/config/missions'
 export function AdminAnswersDrawer({ playerId, participant, missions, onClose }: any) {
   if (!participant) return null
 
@@ -15,27 +15,41 @@ export function AdminAnswersDrawer({ playerId, participant, missions, onClose }:
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X size={20}/></button>
         </div>
         <div className="p-6 space-y-6 flex-1">
-          {missions.sort((a: any, b: any) => a.position - b.position).map((m: any, idx: number) => (
-            <div key={m.id} className="border rounded-xl p-4">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{m.category}</span>
-                {m.completed ? <span className="text-green-600 text-xs font-bold">Done</span> : <span className="text-gray-400 text-xs font-bold">Pending</span>}
-              </div>
-              
-              {m.completed && m.answers ? (
-                <div className="space-y-3 mt-4 bg-gray-50 p-3 rounded-lg">
-                  {Object.entries(m.answers).map(([k, v]) => (
-                    <div key={k}>
-                      <div className="text-xs text-gray-500 uppercase">{k}</div>
-                      <div className="font-medium text-sm">{String(v)}</div>
-                    </div>
-                  ))}
+          {missions.sort((a: any, b: any) => a.position - b.position).map((m: any, idx: number) => {
+            const missionDef = allMissions.find(def => def.id === m.mission_id)
+            
+            return (
+              <div key={m.id} className="border rounded-xl p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{m.category}</span>
+                  {m.completed ? <span className="text-green-600 text-xs font-bold">Done</span> : <span className="text-gray-400 text-xs font-bold">Pending</span>}
                 </div>
-              ) : (
-                <div className="mt-4 text-sm text-gray-400 italic">No answers yet</div>
-              )}
-            </div>
-          ))}
+                
+                {missionDef && (
+                  <p className="font-medium text-sm text-gray-800 leading-snug mb-3">
+                    {missionDef.prompt}
+                  </p>
+                )}
+                
+                {m.completed && m.answers ? (
+                  <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
+                    {Object.entries(m.answers).map(([k, v]) => {
+                      const fieldDef = missionDef?.fields.find(f => f.key === k)
+                      const label = fieldDef ? fieldDef.label : k
+                      return (
+                        <div key={k}>
+                          <div className="text-xs text-gray-500 uppercase">{label}</div>
+                          <div className="font-semibold text-sm text-black">{String(v)}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-400 italic">No answers yet</div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
