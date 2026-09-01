@@ -55,17 +55,21 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
 
     const channel = supabase.channel(`session_${activeSessionId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, (payload) => {
+        const item = payload.new as any
+        if (!item || !item.id) return
         setParticipants(prev => {
-          const exists = prev.find(p => p.id === payload.new.id)
-          if (exists) return prev.map(p => p.id === payload.new.id ? payload.new : p)
-          return [...prev, payload.new]
+          const exists = prev.find(p => p.id === item.id)
+          if (exists) return prev.map(p => p.id === item.id ? item : p)
+          return [...prev, item]
         })
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'participant_missions' }, (payload) => {
+        const item = payload.new as any
+        if (!item || !item.id) return
         setMissions(prev => {
-          const exists = prev.find(m => m.id === payload.new.id)
-          if (exists) return prev.map(m => m.id === payload.new.id ? payload.new : m)
-          return [...prev, payload.new]
+          const exists = prev.find(m => m.id === item.id)
+          if (exists) return prev.map(m => m.id === item.id ? item : m)
+          return [...prev, item]
         })
       })
       .subscribe()
