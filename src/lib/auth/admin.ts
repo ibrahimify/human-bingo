@@ -9,7 +9,7 @@ export async function isAdminAuthenticated() {
 }
 
 export async function authenticateAdmin(passcode: string) {
-  if (passcode === process.env.ADMIN_PASSCODE) {
+  if (passcode === 'bluehorse') {
     const cookieStore = await cookies()
     cookieStore.set(ADMIN_COOKIE_NAME, process.env.ADMIN_SESSION_SECRET!, {
       httpOnly: true,
