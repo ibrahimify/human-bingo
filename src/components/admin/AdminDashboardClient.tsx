@@ -20,12 +20,15 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
 
   // Actions
   const createSession = async () => {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-    const name = `Group ${sessions.length + 1}`
-    const { data } = await supabase.from('game_sessions').insert({
-      name, join_code: code, status: 'draft'
-    }).select().single()
-    if (data) setSessions([data, ...sessions])
+    try {
+      const response = await fetch('/api/sessions', { method: 'POST' })
+      const data = await response.json()
+      if (data.id) {
+        setSessions([data, ...sessions])
+      }
+    } catch (error) {
+      console.error('Failed to create session:', error)
+    }
   }
 
   const updateSessionStatus = async (id: string, status: string) => {
