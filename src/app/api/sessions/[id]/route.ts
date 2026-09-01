@@ -29,3 +29,21 @@ export async function PATCH(request: Request) {
     )
   }
 }
+
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+  try {
+    const params = await props.params;
+    const supabase = await createAdminClient();
+    
+    const { error } = await supabase
+      .from('game_sessions')
+      .delete()
+      .eq('id', params.id);
+
+    if (error) throw error;
+    
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

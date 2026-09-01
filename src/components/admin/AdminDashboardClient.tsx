@@ -20,14 +20,35 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
 
   // Actions
   const createSession = async () => {
+    const name = window.prompt("Enter a name for this session (e.g., 'Morning Group A'):");
+    if (name === null) return; // cancelled
+    
     try {
-      const response = await fetch('/api/sessions', { method: 'POST' })
+      const response = await fetch('/api/sessions', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() })
+      })
       const data = await response.json()
       if (data.id) {
         setSessions([data, ...sessions])
+        setActiveSessionId(data.id)
       }
     } catch (error) {
       console.error('Failed to create session:', error)
+    }
+  }
+
+  const deleteSession = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm("Are you sure you want to permanently delete this session?")) return;
+    
+    try {
+      await fetch(`/api/sessions/${id}`, { method: 'DELETE' })
+      setSessions(prev => prev.filter(s => s.id !== id))
+      if (activeSessionId === id) setActiveSessionId(null)
+    } catch (error) {
+      console.error('Failed to delete session:', error)
     }
   }
 
@@ -122,10 +143,19 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
             <div 
               key={s.id} 
               onClick={() => setActiveSessionId(s.id)}
-              className={`p-4 rounded-xl cursor-pointer border transition-colors ${activeSessionId === s.id ? 'border-black bg-white shadow-sm' : 'border-transparent hover:bg-gray-100'}`}
+              className={`p-4 rounded-xl cursor-pointer border transition-colors group flex justify-between items-start ${activeSessionId === s.id ? 'border-black bg-white shadow-sm' : 'border-transparent hover:bg-gray-100'}`}
             >
-              <div className="font-bold">{s.name}</div>
-              <div className="text-sm text-gray-500 uppercase tracking-wider">{s.status}</div>
+              <div>
+                <div className="font-bold">{s.name}</div>
+                <div className="text-sm text-gray-500 uppercase tracking-wider">{s.status}</div>
+              </div>
+              <button 
+                onClick={(e) => deleteSession(s.id, e)}
+                className="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Delete session"
+              >
+                ✕
+              </button>
             </div>
           ))}
         </div>

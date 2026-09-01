@@ -34,6 +34,18 @@ export function PlaySessionClient({ session }: { session: any }) {
     return () => clearInterval(interval)
   }, [step, timerStart])
 
+  // Listen to session status changes via polling (since game_sessions isn't in realtime publication)
+  useEffect(() => {
+    if (step !== 'play') return;
+    const interval = setInterval(async () => {
+      const { data } = await supabase.from('game_sessions').select('status').eq('id', session.id).single();
+      if (data && data.status === 'closed') {
+        setStep('closed')
+      }
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [step, session.id, supabase])
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0')
     const s = (seconds % 60).toString().padStart(2, '0')
@@ -185,6 +197,19 @@ export function PlaySessionClient({ session }: { session: any }) {
           <p className="text-gray-600 mb-6">5 / 5 completed</p>
           <div className="text-5xl font-bold tracking-tighter mb-6">{formatTime(elapsed)}</div>
           <p className="text-sm font-medium">Nice work. Head back to the mentors and wait for the results.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'closed') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 text-center">
+        <div className="card w-full max-w-sm">
+          <h2 className="text-2xl font-bold mb-1 text-red-600">Time's Up!</h2>
+          <p className="text-gray-600 mb-6">The mentors have ended this round.</p>
+          <div className="text-5xl font-bold tracking-tighter mb-6">{formatTime(elapsed)}</div>
+          <p className="text-sm font-medium">Head back to the center to see who won!</p>
         </div>
       </div>
     )
