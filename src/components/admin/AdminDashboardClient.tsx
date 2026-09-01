@@ -21,18 +21,23 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
   // Actions
   const createSession = async () => {
     const name = window.prompt("Enter a name for this session (e.g., 'Morning Group A'):");
-    if (name === null) return; // cancelled
+    if (!name) return; // cancelled
+
+    const customCode = window.prompt("Enter a 6-character Join Code (e.g., '111111' or 'BINGO1'):");
+    if (!customCode) return; // cancelled
     
     try {
       const response = await fetch('/api/sessions', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim() })
+        body: JSON.stringify({ name: name.trim(), join_code: customCode.trim().toUpperCase() })
       })
       const data = await response.json()
       if (data.id) {
         setSessions([data, ...sessions])
         setActiveSessionId(data.id)
+      } else if (data.error) {
+        alert("Error creating session: " + data.error);
       }
     } catch (error) {
       console.error('Failed to create session:', error)
