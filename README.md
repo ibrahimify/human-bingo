@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Human Bingo
 
-## Getting Started
+A small web app I built for an international student orientation event at BME.
 
-First, run the development server:
+**Live demo:** https://human-bingo-phi.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Why I Made It
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+University orientation can be overwhelming. New faces, a new environment, and everything feels unfamiliar. But the right icebreaker can turn that awkward tension into real connection fast. This game needs no supplies, no complicated setup, and no stress. Just show up and get people talking.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+During orientation, a lot of new students naturally stick with the first people they meet. I wanted to make something that would push them to talk to different people without making it feel forced.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+At the same time, we still wanted them to learn a few useful things about BME, Budapest, the international community, and IAC.
 
-## Learn More
+So I made Human Bingo.
 
-To learn more about Next.js, take a look at the following resources:
+Instead of sitting through another quiz, students get short missions on their phones and have to walk around, ask people questions, and collect answers. The first students to finish can win small prizes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How It Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Scan the QR code and enter your name.
+2. Start the game and the timer begins.
+3. You get 5 random missions from different categories.
+4. Complete each mission by talking to other students, mentors, or IAC members.
+5. Submit your answers on your phone.
+6. The live leaderboard shows who is progressing fastest.
 
-## Deploy on Vercel
+If the round ends before everyone finishes, ranking is based on how many missions were completed and how quickly they were completed.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Mission Categories
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- BME
+- Budapest and Hungary
+- International
+- People
+- IAC
+
+## Features
+
+- Mobile-first player interface
+- Randomized missions
+- Live progress and timer
+- Separate rounds for different groups
+- Live admin leaderboard
+- Answer review for mentors
+- Round stopping and archiving
+- Simple admin access
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Vercel
+
+## Idea Behind the Game
+
+The app is meant to stay in the background.
+
+The real point is to get students moving around the room, starting conversations, meeting people outside their group, and learning a few useful things along the way.
