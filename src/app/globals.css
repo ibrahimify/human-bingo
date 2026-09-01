@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #F7F7F5;
+  --foreground: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #F7F7F5; /* Enforce light theme for MVP to match Nike aesthetic */
+    --foreground: #111111;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .btn-primary {
+    @apply bg-[#111111] text-white px-6 py-4 rounded-full font-medium transition-transform active:scale-95 disabled:opacity-50 disabled:active:scale-100 flex justify-center items-center;
+  }
+  .card {
+    @apply bg-white rounded-[20px] border border-[#E5E5E5] p-6 shadow-sm;
+  }
+  .input-field {
+    @apply w-full border border-[#E5E5E5] rounded-2xl px-4 py-3 bg-[#F7F7F5] focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111] transition-all;
+  }
+}
