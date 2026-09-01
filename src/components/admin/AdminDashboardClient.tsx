@@ -156,7 +156,7 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
               </div>
               <button 
                 onClick={(e) => deleteSession(s.id, e)}
-                className="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="text-gray-300 hover:text-red-600 transition-colors p-1"
                 title="Delete session"
               >
                 ✕
