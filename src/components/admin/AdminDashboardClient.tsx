@@ -210,9 +210,19 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
                   <tbody>
                     {leaderboard.map((p, idx) => {
                       const isTop = idx < 2 && p.completedCount > 0
-                      const elapsedStr = p.completedAt 
-                        ? Math.floor((new Date(p.completedAt).getTime() - new Date(p.startedAt).getTime()) / 1000) + 's'
-                        : '-'
+                      
+                      let endTime = Date.now();
+                      if (p.completedAt) {
+                        endTime = new Date(p.completedAt).getTime();
+                      } else if (activeSession.status === 'closed' && activeSession.stopped_at) {
+                        endTime = new Date(activeSession.stopped_at).getTime();
+                      }
+                      
+                      const elapsedSeconds = Math.max(0, Math.floor((endTime - new Date(p.startedAt).getTime()) / 1000));
+                      const m = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                      const s = (elapsedSeconds % 60).toString().padStart(2, '0');
+                      const elapsedStr = `${m}:${s}`;
+
                       return (
                         <tr key={p.id} className={`border-b last:border-0 ${isTop ? 'bg-gray-50' : ''}`}>
                           <td className="py-3 px-2 font-bold">{idx + 1}</td>

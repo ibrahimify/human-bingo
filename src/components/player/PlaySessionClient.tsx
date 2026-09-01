@@ -21,6 +21,7 @@ export function PlaySessionClient({ session }: { session: any }) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [timerStart, setTimerStart] = useState<number | null>(null)
+  const [timerEnd, setTimerEnd] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
 
   // Timer loop
@@ -30,16 +31,19 @@ export function PlaySessionClient({ session }: { session: any }) {
       interval = setInterval(() => {
         setElapsed(Math.floor((Date.now() - timerStart) / 1000))
       }, 1000)
+    } else if ((step === 'closed' || step === 'finished') && timerStart && timerEnd) {
+      setElapsed(Math.floor((timerEnd - timerStart) / 1000))
     }
     return () => clearInterval(interval)
-  }, [step, timerStart])
+  }, [step, timerStart, timerEnd])
 
-  // Listen to session status changes via polling (since game_sessions isn't in realtime publication)
+  // Listen to session status changes via polling
   useEffect(() => {
     if (step !== 'play') return;
     const interval = setInterval(async () => {
-      const { data } = await supabase.from('game_sessions').select('status').eq('id', session.id).single();
+      const { data } = await supabase.from('game_sessions').select('status, stopped_at').eq('id', session.id).single();
       if (data && data.status === 'closed') {
+        if (data.stopped_at) setTimerEnd(new Date(data.stopped_at).getTime());
         setStep('closed')
       }
     }, 5000)
@@ -136,14 +140,16 @@ export function PlaySessionClient({ session }: { session: any }) {
 
       if (currentMissionIndex === 4) {
         // Finished all
+        const now = Date.now();
         const { error: completeError } = await supabase.from('participants')
-          .update({ completed_at: new Date().toISOString() })
+          .update({ completed_at: new Date(now).toISOString() })
           .eq('id', participantId)
         
         if (completeError) {
           console.error('Participant complete error:', completeError)
         }
 
+        setTimerEnd(now);
         setStep('finished')
       } else {
         setCurrentMissionIndex(i => i + 1)
