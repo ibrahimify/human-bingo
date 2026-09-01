@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { calculateRanking, RankingPlayer } from '@/lib/ranking'
 import { Button } from '@/components/ui/Button'
-import { Users, Timer, CheckCircle, Activity } from 'lucide-react'
+import { Users, Timer, CheckCircle, Activity, Trash2 } from 'lucide-react'
 import { AdminAnswersDrawer } from './AdminAnswersDrawer'
 
 export function AdminDashboardClient({ initialSessions }: { initialSessions: any[] }) {
@@ -156,10 +156,10 @@ export function AdminDashboardClient({ initialSessions }: { initialSessions: any
               </div>
               <button 
                 onClick={(e) => deleteSession(s.id, e)}
-                className="text-gray-300 hover:text-red-600 transition-colors p-1"
+                className="text-red-500 hover:text-red-700 transition-colors p-2 bg-red-50 hover:bg-red-100 rounded-md"
                 title="Delete session"
               >
-                ✕
+                <Trash2 size={18} />
               </button>
             </div>
           ))}
