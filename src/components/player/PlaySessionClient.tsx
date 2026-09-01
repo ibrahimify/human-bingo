@@ -107,27 +107,40 @@ export function PlaySessionClient({ session }: { session: any }) {
 
     setLoading(true)
     
-    // Submit answer
-    await supabase.from('participant_missions')
-      .update({
-        completed: true,
-        submitted_at: new Date().toISOString(),
-        answers: answers
-      })
-      .eq('participant_id', participantId)
-      .eq('mission_id', mission.id)
+    try {
+      // Submit answer
+      const { error: updateError } = await supabase.from('participant_missions')
+        .update({
+          completed: true,
+          submitted_at: new Date().toISOString(),
+          answers: answers
+        })
+        .eq('participant_id', participantId)
+        .eq('mission_id', mission.id)
 
-    if (currentMissionIndex === 4) {
-      // Finished all
-      await supabase.from('participants')
-        .update({ completed_at: new Date().toISOString() })
-        .eq('id', participantId)
-      
-      setStep('finished')
-    } else {
-      setCurrentMissionIndex(i => i + 1)
-      setAnswers({})
+      if (updateError) {
+        console.error('Mission update error:', updateError)
+      }
+
+      if (currentMissionIndex === 4) {
+        // Finished all
+        const { error: completeError } = await supabase.from('participants')
+          .update({ completed_at: new Date().toISOString() })
+          .eq('id', participantId)
+        
+        if (completeError) {
+          console.error('Participant complete error:', completeError)
+        }
+
+        setStep('finished')
+      } else {
+        setCurrentMissionIndex(i => i + 1)
+        setAnswers({})
+      }
+    } catch (error) {
+      console.error('Error submitting mission:', error)
     }
+    
     setLoading(false)
   }
 
